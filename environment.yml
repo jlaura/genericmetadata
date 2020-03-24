@@ -1,0 +1,7 @@
+name: metadataengine
+dependencies:
+  - python=3
+  - pysis
+  - jinja2
+  - pvl
+  - plurmy

@@ -1,0 +1,30 @@
+{
+  "thm2isis": {
+      "from_": "{{pds_file}}",
+      "to": "{{isis_file}}"
+  },
+  "spiceinit": {
+      "from_": "{{isis_file}}",
+      "cknadir": "yes",
+      "cksmithed": "yes"
+  },
+  "footprintinit": {
+      "from_": "{{isis_file}}",
+      "increaseprecision": "yes",
+      "inctype": "vertices",
+      "numvertices": "20"
+  },
+  "caminfo": {
+      "from_": "{{isis_file}}",
+      "to": "{{caminfo_pvl}}",
+      "geometry": "yes",
+      "isislabel": "yes",
+      "originallabel": "yes",
+      "statistics": "yes",
+      "camstats": "yes",
+      "linc": "100",
+      "sinc": "100",
+      "uselabel": "yes",
+      "spice": "no"
+  }
+}
