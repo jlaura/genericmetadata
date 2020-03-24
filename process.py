@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 
+# This is epic jank - don't do this - use ENV variables
 os.environ["ISISROOT"] = "/usgs/cpkgs/anaconda3_linux/envs/isis3.9.0"
 os.environ["ISIS3DATA"] = "/usgs/cpkgs/isis3/data"
 
@@ -17,7 +18,19 @@ def parse_args():
     return parser.parse_args()
 
 class Recipe():
+    """
+    A thin wrapper that renders a Jinja2 template and then
+    runs the recipe using ISIS.
+
+    """
     def __init__(self, definition_file):
+        """
+        Parameters
+        ----------
+        definition_file : str
+                          PATH to a jinja template containing an ISIS 
+                          processing pipeline
+        """
         if not os.path.exists(definition_file):
             raise FileNotFoundError(f'File {definition_file} does not exist.')
         with open(definition_file, 'r') as df:
@@ -25,9 +38,17 @@ class Recipe():
             self.recipe = Template(df.read())
 
     def render(self, **kwargs):
+        """
+        Renders the recipe to a JSON string and then loads it.
+        """
         self.rendered = json.loads(self.recipe.render(**kwargs))
 
     def process(self):
+        """
+        Iterate over the rendered recipe and perform each processing
+        step. Now that python dics are ordered, we have no worries on 
+        iterating naively.
+        """
         for func, kwargs in self.rendered.items():
             # Get the func from the pysis.isis namespace
             func = getattr(isis, func)
