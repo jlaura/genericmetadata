@@ -1,0 +1,5 @@
+{% block proj %}
+  "proj:epsg" : "{{epsg}}",
+  "proj:proj4" : "{{proj4}}",
+  "proj:wkt2" : "{{wkt2}}"
+{% endblock %}

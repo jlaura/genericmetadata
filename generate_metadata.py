@@ -7,9 +7,12 @@ import json
 os.environ["ISISROOT"] = "/usgs/cpkgs/anaconda3_linux/envs/isis3.9.0"
 os.environ["ISIS3DATA"] = "/usgs/cpkgs/isis3/data"
 
+import ogr
 import pvl
 from pysis import isis
 from pysis.exceptions import ProcessError
+
+from utils import find_in_dict, CustomJsonEncoder
 
 
 def parse_args():
@@ -17,28 +20,6 @@ def parse_args():
     parser.add_argument('inputfile', help='The PATH to the ISIS cube file.')
     parser.add_argument('caminfopvl', help='The PATH to the caminfo pvl file.')
     return parser.parse_args()
-
-def find_in_dict(obj, key):
-    """
-    Recursively find an entry in a dictionary
-    Parameters
-    ----------
-    obj : dict
-          The dictionary to search
-    key : str
-          The key to find in the dictionary
-    Returns
-    -------
-    item : obj
-           The value from the dictionary
-    """
-    if key in obj:
-        return obj[key]
-    for k, v in obj.items():
-        if isinstance(v,dict):
-            item = find_in_dict(v, key)
-            if item is not None:
-                return item
 
 def get_footprint(file_isis, label):
     """
@@ -62,13 +43,11 @@ def get_footprint(file_isis, label):
 
     return poly_wkt
 
-class CustomJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        elif isinstance(obj, datetime.date):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
+def footprint_to_geojson(footprint):
+    fp = ogr.CreateGeometryFromWkt(footprint)
+    geojson = {"bbox":fp.GetEnvelope(),
+               "geometry":fp.ExportToJson()}
+    return geojson
 
 def main(args):
     if not os.path.exists(args.inputfile):
@@ -88,6 +67,7 @@ def main(args):
     # Grab the 'other' metadata
     productid = find_in_dict(label_isis, 'ProductId')
     footprint = get_footprint(args.inputfile, label_isis)
+    geojson = footprint_to_geojson(footprint)
     provenance = pvl.load(isis.cathist(from_=args.inputfile))
     
     # Custom pack in python to ensure we get valid JSON.
@@ -96,7 +76,8 @@ def main(args):
                 "label_isis" : label_isis,
                 "sensorinfo" : sensorinfo,
                 "provenance" : provenance,
-                "footprint" : footprint}
+                "spatial" : geojson}  # This is here because we want to use ISIS and not GDAL for coords.
+                
 
     # Setup all the paths for reading/writing
     # naive now - output in one dir.

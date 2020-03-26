@@ -1,0 +1,16 @@
+{
+"stac_version":"{{stac_version}}",
+"id": "{{productid}}",
+"type" : "Feature", 
+"stac_extensions": ["proj"],
+"bbox": {{bbox}},
+"geometry": {{geometry}},
+"properties": {
+    "datetime" : "{{datetime}}",
+    "proj:epsg" : "{{epsg}}",
+    "proj:proj4" : "{{proj4}}",
+    "proj:wkt2" : {{wkt2}}
+}, 
+"links": {{links}},
+"assets":{{assets}} 
+}

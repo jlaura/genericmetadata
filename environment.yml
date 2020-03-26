@@ -4,4 +4,4 @@ dependencies:
   - pysis
   - jinja2
   - pvl
-  - plurmy
+  - gdal 

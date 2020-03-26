@@ -1,7 +1,10 @@
 # genericmetadata
 
-This is a super lightweight metadata generation toolkit composed of two
-scripts:
+This is a super lightweight metadata generation toolkit composed of some
+scripts. Right now, these are being manually run in the pipeline:
+
+`process -> generate_metadata -> <arbitrary processing to L2> -> generate_proj`
+
 
 - `process.py`: Processes a PDS file and outputs an ISIS cube that has a
   footprint and a caminfo pvl file.
